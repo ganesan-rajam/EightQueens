@@ -1,16 +1,18 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Stack;
+import java.util.*;
 
 public class EightQueensExecutionContext {
     private int[] rows = {0,0,0,0,0,0,0,0};
     private int[] colValuesPerRow = {0,0,0,0,0,0,0,0};
     private List<String> solutions;
+    private HashSet<String> solutionSet;
+    private HashSet<String> totalSolutionSet;
+
     private Stack<RowColumnContext> rowColumnContexts;
 
     public EightQueensExecutionContext() {
         this.rowColumnContexts = new Stack<RowColumnContext>();
+        this.solutionSet = new HashSet<String>();
+        this.totalSolutionSet = new HashSet<String>();
         this.solutions = new ArrayList<String>();
     }
 
@@ -39,6 +41,7 @@ public class EightQueensExecutionContext {
             return;
 
         solutions.add(solution);
+        solutionSet.add(solution);
     }
 
     public void resetRowValues () {
@@ -151,5 +154,17 @@ public class EightQueensExecutionContext {
 
     public List<String> getSolutions () {
         return solutions;
+    }
+
+    public HashSet<String> getSolutionSet () { return solutionSet; }
+
+    public HashSet<String> getTotalSolutionSet () { return totalSolutionSet; }
+
+    public void emptySolutionSet () { solutionSet.clear(); }
+
+    public void copySolutionSetToTotalSet () {
+        for (String sol : solutionSet) {
+            totalSolutionSet.add(sol);
+        }
     }
 }
