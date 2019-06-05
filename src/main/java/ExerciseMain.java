@@ -3,6 +3,6 @@ public class ExerciseMain {
         EightQueens eightQueens = new EightQueens();
         eightQueens.solve();
 //        BitTest bt = new BitTest();
-//        bt.testRowClear();
+//        bt.testColumnInvalid();
     }
 }
