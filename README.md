@@ -1,0 +1,2 @@
+# EightQueens
+EightQueens solution
