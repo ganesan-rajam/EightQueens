@@ -1,25 +1,32 @@
 import java.util.HashSet;
-import java.util.List;
 
 public class ExerciseMain {
     public static void main(String[] arguments) {
-        EightQueens eightQueens = new EightQueens();
-        long startTime = System.nanoTime();
-        HashSet<Integer> solutionSet = eightQueens.solve();
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime);
+        long startTime;
+        long endTime;
+        long duration;
+        HashSet<Integer> solutionSet;
+        int numOfSols;
 
-        System.out.println("Total number of solutions found: " + solutionSet.size() + " in duration(millisecs): " + duration/1000000);
-
-        KPSol sol = new KPSol();
         startTime = System.nanoTime();
-        List<Integer> solList = sol.solve();
+        EightQueensRunner er1 = new EightQueensRunner(0, 3);
+        EightQueensRunner er2 = new EightQueensRunner(4, 7);
+        er1.start();
+        er2.start();
+        try {
+            er1.join();
+            er2.join();
+        } catch (Exception e) {
+            System.out.println("Exception:" + e);
+        }
         endTime = System.nanoTime();
         duration = (endTime - startTime);
 
-        System.out.println("Total number of solutions found: " + solList.size() + " in duration(millisecs): " + duration/1000000);
+        solutionSet = er1.getRunResults();
+        numOfSols = solutionSet.size();
+        solutionSet = er2.getRunResults();
+        numOfSols = numOfSols + solutionSet.size();
 
-//        BitTest bt = new BitTest();
-//        bt.strTest();
+        System.out.println("Total number of solutions found: " + numOfSols + " in duration(millisecs): " + duration/1000000);
     }
 }

@@ -24,11 +24,11 @@ public class EightQueensExecutionContext {
     private Integer getSolutionFromStack() {
         ListIterator<RowColumnContext> listIterator = rowColumnContexts.listIterator();
         int solution = 0;
-        int mfactor = EightQueensExecutionConstants.M_SIZE-1;
+        int mFactor = EightQueensExecutionConstants.M_SIZE-1;
         while (listIterator.hasNext()) {
             RowColumnContext context = listIterator.next();
             RowColumnTuple tuple = context.getRowColumnTuple();
-            solution = solution + ((tuple.getColumn()+1) * power(10, (mfactor - tuple.getRow())));
+            solution = solution + ((tuple.getColumn()+1) * power(10, (mFactor - tuple.getRow())));
         }
 
         return solution;
