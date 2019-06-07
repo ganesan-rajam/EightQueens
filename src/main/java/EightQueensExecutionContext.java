@@ -37,11 +37,24 @@ public class EightQueensExecutionContext {
     public void prepareAndStoreSolution() {
         String solution = getSolutionFromStack();
 
-        if (solution == null || solution.isEmpty())
+        if (solution == null || solution.isEmpty()) {
+            System.out.printf("Invalid solution string.");
             return;
+        }
 
+        System.out.printf("---------\n");
+        System.out.printf("Solution : %s\n", solution);
+        System.out.printf("---------\n");
         solutions.add(solution);
         solutionSet.add(solution);
+    }
+
+    private void printRowValues () {
+        System.out.printf("ROW-VALUES: ");
+        for (int i=0; i<rows.length; i++) {
+            System.out.printf("%s ", Integer.toBinaryString(rows[i]));
+        }
+        System.out.printf("\n");
     }
 
     public void resetRowValues () {
@@ -87,7 +100,8 @@ public class EightQueensExecutionContext {
     public int markPositionsAndCheckSelection (int selRowPos, int selColPos) {
         // All positions except selected row position should be marked
 
-//        System.out.printf("Marking positions: row: %d, column : %d\n", selRowPos, selColPos);
+        System.out.printf("Stack Values : %s\n", rowColumnContexts.toString());
+        System.out.printf("Marking positions: row: %d, column : %d : ", selRowPos+1, selColPos+1);
 
         int rowMask = EightQueensExecutionConstants.POS_SET_MASK << selColPos;
         rowMask = ~rowMask;
@@ -102,6 +116,8 @@ public class EightQueensExecutionContext {
                 rows[rPos] = rows[rPos] | colMask;
                 // If all bits are set in a row then selection is invalid.
                 if (rows[rPos] == EightQueensExecutionConstants.ALL_POS_MASK) {
+                    System.out.printf("SELECTION_ROW_INVALID\n");
+                    printRowValues();
                     return EightQueensExecutionConstants.SELECTION_INVALID;
                 }
             }
@@ -110,9 +126,12 @@ public class EightQueensExecutionContext {
 
         // If all bits are set for a column in all rows then selection is invalid.
         if (checkCols != 0) {
+            System.out.printf("SELECTION_COLUMN_INVALID\n");
+            System.out.printf("ROW_VALUES: %s\n", Arrays.toString(rows));
             return EightQueensExecutionConstants.SELECTION_INVALID;
         }
 
+        System.out.printf("SELECTION_VALID\n");
         return EightQueensExecutionConstants.SELECTION_VALID;
     }
 
