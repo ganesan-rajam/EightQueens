@@ -52,7 +52,7 @@ public class EightQueens {
         solveUsingColumnForSelectedPositionRecurse(firstRowPos, firstColPos, executionContext);
     }
 
-    public HashSet<String> solve () {
+    public HashSet<Integer> solve () {
         EightQueensExecutionContext executionContext = new EightQueensExecutionContext();
         int colPos = 0;
         for (int rowPos = 0; rowPos < EightQueensExecutionConstants.M_SIZE; rowPos++) {
@@ -62,11 +62,9 @@ public class EightQueens {
             executionContext.reset();
         }
 
-        HashSet<String> solutionSet = executionContext.getSolutionSet();
-//        List<String> solutionList = new ArrayList<String>(solutionSet);
-//        Collections.sort(solutionList);
-//        for (String sol : solutionList) {
-//            System.out.printf("%s \n", sol);
+        HashSet<Integer> solutionSet = executionContext.getSolutionSet();
+//        for (Integer sol : solutionSet) {
+//            System.out.printf("%d \n", sol);
 //        }
         return solutionSet;
     }

@@ -2,32 +2,36 @@ import java.util.*;
 
 public class EightQueensExecutionContext {
     private int[] rows = {0,0,0,0,0,0,0,0};
-    private int[] solution = {0,0,0,0,0,0,0,0};
-    private HashSet<String> solutionSet;
+    private HashSet<Integer> solutionSet;
 
     private Stack<RowColumnContext> rowColumnContexts;
 
     public EightQueensExecutionContext() {
         this.rowColumnContexts = new Stack<RowColumnContext>();
-        this.solutionSet = new HashSet<String>();
+        this.solutionSet = new HashSet<Integer>();
     }
 
-    private String getSolutionFromStack() {
-        ListIterator<RowColumnContext> listIterator = rowColumnContexts.listIterator();
+    static int power(int x, int y)
+    {
+        if (y == 0)
+            return 1;
+        else if (y % 2 == 0)
+            return power(x, y / 2) * power(x, y / 2);
+        else
+            return x * power(x, y / 2) * power(x, y / 2);
+    }
 
+    private Integer getSolutionFromStack() {
+        ListIterator<RowColumnContext> listIterator = rowColumnContexts.listIterator();
+        int solution = 0;
+        int mfactor = EightQueensExecutionConstants.M_SIZE-1;
         while (listIterator.hasNext()) {
             RowColumnContext context = listIterator.next();
             RowColumnTuple tuple = context.getRowColumnTuple();
-            solution[tuple.getRow()] = tuple.getColumn();
+            solution = solution + ((tuple.getColumn()+1) * power(10, (mfactor - tuple.getRow())));
         }
 
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i< EightQueensExecutionConstants.M_SIZE; i++) {
-            sb.append(solution[i]+1);
-        }
-
-        return sb.toString();
+        return solution;
     }
 
     private void resetRowValues () {
@@ -141,16 +145,9 @@ public class EightQueensExecutionContext {
     }
 
     public void storeSolution() {
-        String solution = getSolutionFromStack();
-
-        if (solution == null || solution.isEmpty()) {
-            System.out.printf("storeSolution: Invalid solution string.\n");
-            System.out.printf("storeSolution: Values: %s\n", rowColumnContexts.toString());
-            return;
-        }
-
+        Integer solution = getSolutionFromStack();
         solutionSet.add(solution);
     }
 
-    public HashSet<String> getSolutionSet () { return solutionSet; }
+    public HashSet<Integer> getSolutionSet () { return solutionSet; }
 }

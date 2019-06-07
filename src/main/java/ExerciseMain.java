@@ -5,7 +5,7 @@ public class ExerciseMain {
     public static void main(String[] arguments) {
         EightQueens eightQueens = new EightQueens();
         long startTime = System.nanoTime();
-        HashSet<String> solutionSet = eightQueens.solve();
+        HashSet<Integer> solutionSet = eightQueens.solve();
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
 
@@ -18,5 +18,8 @@ public class ExerciseMain {
         duration = (endTime - startTime);
 
         System.out.println("Total number of solutions found: " + solList.size() + " in duration(millisecs): " + duration/1000000);
+
+//        BitTest bt = new BitTest();
+//        bt.strTest();
     }
 }
