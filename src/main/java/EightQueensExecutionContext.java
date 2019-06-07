@@ -2,18 +2,14 @@ import java.util.*;
 
 public class EightQueensExecutionContext {
     private int[] rows = {0,0,0,0,0,0,0,0};
-    private int[] colValuesPerRow = {0,0,0,0,0,0,0,0};
-    private List<String> solutions;
+    private int[] solution = {0,0,0,0,0,0,0,0};
     private HashSet<String> solutionSet;
-    private HashSet<String> totalSolutionSet;
 
     private Stack<RowColumnContext> rowColumnContexts;
 
     public EightQueensExecutionContext() {
         this.rowColumnContexts = new Stack<RowColumnContext>();
         this.solutionSet = new HashSet<String>();
-        this.totalSolutionSet = new HashSet<String>();
-        this.solutions = new ArrayList<String>();
     }
 
     private String getSolutionFromStack() {
@@ -22,87 +18,64 @@ public class EightQueensExecutionContext {
         while (listIterator.hasNext()) {
             RowColumnContext context = listIterator.next();
             RowColumnTuple tuple = context.getRowColumnTuple();
-            colValuesPerRow[tuple.getRow()] = tuple.getColumn();
+            solution[tuple.getRow()] = tuple.getColumn();
         }
 
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i< EightQueensExecutionConstants.M_SIZE; i++) {
-            sb.append(colValuesPerRow[i]+1);
+            sb.append(solution[i]+1);
         }
 
         return sb.toString();
     }
 
-    public void prepareAndStoreSolution() {
-        String solution = getSolutionFromStack();
-
-        if (solution == null || solution.isEmpty()) {
-            System.out.printf("Invalid solution string.");
-            return;
-        }
-
-        System.out.printf("---------\n");
-        System.out.printf("Solution : %s\n", solution);
-        System.out.printf("---------\n");
-        solutions.add(solution);
-        solutionSet.add(solution);
-    }
-
-    private void printRowValues () {
-        System.out.printf("ROW-VALUES: ");
-        for (int i=0; i<rows.length; i++) {
-            System.out.printf("%s ", Integer.toBinaryString(rows[i]));
-        }
-        System.out.printf("\n");
-    }
-
-    public void resetRowValues () {
+    private void resetRowValues () {
         for (int i=0; i<rows.length; i++)
             rows[i] = 0;
     }
 
-    public void copyRowValues (int[] values) {
+    private void copyRowValues (int[] values) {
         for (int i=0; i<values.length; i++)
             rows[i] = values[i];
     }
 
-    private int getColumnMaskForCurrentRow(int selRowPos, int selColPos, int currRowPos) {
+    private void clearRowColumnValues() {
+        rowColumnContexts.clear();
+    }
+
+    private int getColumnMaskForCurrentRow(int row, int col, int currRow) {
         int colMask = 0;
         int distance = 0;
 
         // Mask the selected column first
-        colMask = colMask | (EightQueensExecutionConstants.POS_SET_MASK << selColPos);
+        colMask = colMask | (EightQueensExecutionConstants.POS_SET_MASK << col);
 
         // Find distance of current row from selected row
-        if (selRowPos > currRowPos) {
-            distance = selRowPos - currRowPos;
-        } else if (selRowPos < currRowPos) {
-            distance = currRowPos - selRowPos;
+        if (row > currRow) {
+            distance = row - currRow;
+        } else if (row < currRow) {
+            distance = currRow - row;
         } else {
-            System.out.printf("Invalid input. Select and Current rows are same.");
+            System.out.printf("getColumnMaskForCurrentRow: Invalid input. Selected and current rows are same.\n");
             System.exit(1);
         }
 
         // Set the right column
-        if ((selColPos + distance) <= 7) {
-            colMask = colMask | (EightQueensExecutionConstants.POS_SET_MASK << (selColPos + distance));
+        if ((col + distance) <= 7) {
+            colMask = colMask | (EightQueensExecutionConstants.POS_SET_MASK << (col + distance));
         }
 
         // Set the left column
-        if (selColPos >= distance) {
-            colMask = colMask | (EightQueensExecutionConstants.POS_SET_MASK << (selColPos - distance));
+        if (col >= distance) {
+            colMask = colMask | (EightQueensExecutionConstants.POS_SET_MASK << (col - distance));
         }
 
         return colMask;
     }
 
-    public int markPositionsAndCheckSelection (int selRowPos, int selColPos) {
+    public int placeQueenAndCheckSelection (int selRowPos, int selColPos) {
         // All positions except selected row position should be marked
-
-        System.out.printf("Stack Values : %s\n", rowColumnContexts.toString());
-        System.out.printf("Marking positions: row: %d, column : %d : ", selRowPos+1, selColPos+1);
-
         int rowMask = EightQueensExecutionConstants.POS_SET_MASK << selColPos;
         rowMask = ~rowMask;
         rowMask = EightQueensExecutionConstants.INT_CLEAR_MASK & rowMask;
@@ -116,8 +89,6 @@ public class EightQueensExecutionContext {
                 rows[rPos] = rows[rPos] | colMask;
                 // If all bits are set in a row then selection is invalid.
                 if (rows[rPos] == EightQueensExecutionConstants.ALL_POS_MASK) {
-                    System.out.printf("SELECTION_ROW_INVALID\n");
-                    printRowValues();
                     return EightQueensExecutionConstants.SELECTION_INVALID;
                 }
             }
@@ -126,12 +97,9 @@ public class EightQueensExecutionContext {
 
         // If all bits are set for a column in all rows then selection is invalid.
         if (checkCols != 0) {
-            System.out.printf("SELECTION_COLUMN_INVALID\n");
-            System.out.printf("ROW_VALUES: %s\n", Arrays.toString(rows));
             return EightQueensExecutionConstants.SELECTION_INVALID;
         }
 
-        System.out.printf("SELECTION_VALID\n");
         return EightQueensExecutionConstants.SELECTION_VALID;
     }
 
@@ -167,23 +135,22 @@ public class EightQueensExecutionContext {
         copyRowValues(context.getValues());
     }
 
-    public void emptyRowColumnValues() {
-        rowColumnContexts.empty();
+    public void reset () {
+        resetRowValues();
+        clearRowColumnValues();
     }
 
-    public List<String> getSolutions () {
-        return solutions;
+    public void storeSolution() {
+        String solution = getSolutionFromStack();
+
+        if (solution == null || solution.isEmpty()) {
+            System.out.printf("storeSolution: Invalid solution string.\n");
+            System.out.printf("storeSolution: Values: %s\n", rowColumnContexts.toString());
+            return;
+        }
+
+        solutionSet.add(solution);
     }
 
     public HashSet<String> getSolutionSet () { return solutionSet; }
-
-    public HashSet<String> getTotalSolutionSet () { return totalSolutionSet; }
-
-    public void emptySolutionSet () { solutionSet.clear(); }
-
-    public void copySolutionSetToTotalSet () {
-        for (String sol : solutionSet) {
-            totalSolutionSet.add(sol);
-        }
-    }
 }

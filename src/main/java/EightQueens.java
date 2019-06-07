@@ -2,65 +2,54 @@ import java.util.*;
 
 public class EightQueens {
 
-    public void solveUsingColumnForSelectedPositionRecurse (int rowPos, int colIdx, int[] colArr,
+    public void solveUsingColumnForSelectedPositionRecurse (int rowPos, int colPos,
                                                             EightQueensExecutionContext executionContext) {
         // Push the current selection and context.
-        executionContext.pushRowColumnValues(rowPos, colArr[colIdx]);
-        int selValidity = executionContext.markPositionsAndCheckSelection(rowPos, colArr[colIdx]);
+        executionContext.pushRowColumnValues(rowPos, colPos);
+        int selValidity = executionContext.placeQueenAndCheckSelection(rowPos, colPos);
         if (selValidity == EightQueensExecutionConstants.SELECTION_INVALID) {
             executionContext.popAndCopyRowColumnValues();
-            int nextRow = executionContext.getNextRowForColumn(colArr[colIdx], rowPos);
+            int nextRow = executionContext.getNextRowForColumn(colPos, rowPos);
             if (nextRow == EightQueensExecutionConstants.ROW_INVALID) {
                 return;
             } else {
-                solveUsingColumnForSelectedPositionRecurse(nextRow, colIdx, colArr, executionContext);
+                solveUsingColumnForSelectedPositionRecurse(nextRow, colPos, executionContext);
                 return;
             }
         } else if (selValidity == EightQueensExecutionConstants.SELECTION_VALID) {
-            if (colIdx == EightQueensExecutionConstants.M_SIZE-2) {
-                executionContext.prepareAndStoreSolution();
+            if (colPos == EightQueensExecutionConstants.M_SIZE-1) {
+                executionContext.storeSolution();
                 executionContext.popAndCopyRowColumnValues();
                 // Continue for next row in same column.
-                int nextRow = executionContext.getNextRowForColumn(colArr[colIdx], rowPos);
+                int nextRow = executionContext.getNextRowForColumn(colPos, rowPos);
                 if (nextRow == EightQueensExecutionConstants.ROW_INVALID) {
-//                    System.out.printf("ROW_INVALID\n");
                     return;
                 } else {
-//                    System.out.printf("ROW_VALID\n");
-                    solveUsingColumnForSelectedPositionRecurse(nextRow, colIdx, colArr, executionContext);
+                    solveUsingColumnForSelectedPositionRecurse(nextRow, colPos, executionContext);
                     return;
                 }
             }
-            int newColIdx = colIdx + 1;
-            if (newColIdx >= EightQueensExecutionConstants.M_SIZE-1) {
+            int nextColPos = colPos + 1;
+            if (nextColPos >= EightQueensExecutionConstants.M_SIZE) {
                 return;
             }
-            int firstRowForNewCol = executionContext.getFirstRowForColumn(colArr[newColIdx]);
-            solveUsingColumnForSelectedPositionRecurse(firstRowForNewCol, newColIdx, colArr, executionContext);
+            int firstRowForNewCol = executionContext.getFirstRowForColumn(nextColPos);
+            solveUsingColumnForSelectedPositionRecurse(firstRowForNewCol, nextColPos, executionContext);
             executionContext.popAndCopyRowColumnValues();
-            int nextRow = executionContext.getNextRowForColumn(colArr[colIdx], rowPos);
+            int nextRow = executionContext.getNextRowForColumn(colPos, rowPos);
             if (nextRow == EightQueensExecutionConstants.ROW_INVALID) {
                 return;
             } else {
-                solveUsingColumnForSelectedPositionRecurse(nextRow, colIdx, colArr, executionContext);
+                solveUsingColumnForSelectedPositionRecurse(nextRow, colPos, executionContext);
                 return;
             }
         }
     }
 
-    public void solveUsingColumnForSelectedPosition (int colPos, EightQueensExecutionContext executionContext) {
-        int[] colArr = new int[EightQueensExecutionConstants.M_SIZE-1];
-        int firstRow;
-
-        for (int i=0; i<EightQueensExecutionConstants.M_SIZE-1; i++) {
-            if (i >= colPos) {
-                colArr[i] = i+1;
-            } else {
-                colArr[i] = i;
-            }
-        }
-        firstRow = executionContext.getFirstRowForColumn(colArr[0]);
-        solveUsingColumnForSelectedPositionRecurse(firstRow, 0, colArr, executionContext);
+    public void solveUsingColumnForSelectedPosition (EightQueensExecutionContext executionContext) {
+        int firstColPos = 1;
+        int firstRowPos = executionContext.getFirstRowForColumn(firstColPos);
+        solveUsingColumnForSelectedPositionRecurse(firstRowPos, firstColPos, executionContext);
     }
 
     public HashSet<String> solve () {
@@ -68,25 +57,17 @@ public class EightQueens {
         int colPos = 0;
         for (int rowPos = 0; rowPos < EightQueensExecutionConstants.M_SIZE; rowPos++) {
             executionContext.pushRowColumnValues(rowPos, colPos);
-            executionContext.markPositionsAndCheckSelection(rowPos, colPos);
-            solveUsingColumnForSelectedPosition(colPos, executionContext);
-            executionContext.popAndCopyRowColumnValues();
-            executionContext.resetRowValues();
-            executionContext.emptyRowColumnValues();
-            executionContext.copySolutionSetToTotalSet();
-            executionContext.emptySolutionSet();
+            executionContext.placeQueenAndCheckSelection(rowPos, colPos);
+            solveUsingColumnForSelectedPosition(executionContext);
+            executionContext.reset();
         }
 
-        List<String> solutions = executionContext.getSolutions();
-        System.out.printf("Number of solutions found = %d \n", solutions.size());
-
-        HashSet<String> solutionSet = executionContext.getTotalSolutionSet();
-        List<String> solutionList = new ArrayList<String>(solutionSet);
-        Collections.sort(solutionList);
-        for (String sol : solutionList) {
-            System.out.printf("%s \n", sol);
-        }
-        System.out.printf("Total number of solutions found = %d \n", solutionSet.size());
+        HashSet<String> solutionSet = executionContext.getSolutionSet();
+//        List<String> solutionList = new ArrayList<String>(solutionSet);
+//        Collections.sort(solutionList);
+//        for (String sol : solutionList) {
+//            System.out.printf("%s \n", sol);
+//        }
         return solutionSet;
     }
 }
